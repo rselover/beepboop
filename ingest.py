@@ -3,6 +3,16 @@ import json
 import requests
 import numpy as np
 
+def clean_data(df : pd.DataFrame) -> pd.DataFrame:
+    df.replace(r'^\s*$', np.nan, regex=True, inplace=True)
+    df['GLA (Above Grade)']=df['GLA (Above Grade)'].str.replace(',','').astype(float)    
+    df['Building_Value_Float']=df['FY24 Bldg Val'].str.replace('$','').str.replace(',','').astype(float)
+    df['Land_Value_Float']=df['FY24 Land Val'].str.replace('$','').str.replace(',','').astype(float)
+    df['Total_Value_Float']=df['FY24 Total Val'].str.replace('$','').str.replace(',','').astype(float)
+    df['$/AGSF']=df['Building_Value_Float']/df['GLA (Above Grade)']
+    df['$/Acre']=df['Land_Value_Float']/df['Acres']
+    return df
+
 def ingest(url):
     # Load the JSON data from the URL
     data = requests.get(url).json()
@@ -37,5 +47,7 @@ def ingest(url):
     # Convert the list of dictionaries into a DataFrame
     df = pd.DataFrame(dicts)
 
+    # Clean the data
+    df_clean = clean_data(df)
     # Return the DataFrame
-    return df
+    return df_clean
