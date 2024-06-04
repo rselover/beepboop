@@ -1,5 +1,11 @@
 from dash import Dash, html, dcc, callback, Output, Input
 import plotly.express as px
+import dash_bootstrap_components as dbc
+from dash_bootstrap_templates import load_figure_template
+
+# loads the "darkly" template and sets it as the default
+load_figure_template("darkly")
+
 import pandas as pd
 from ingest import ingest
 from plots import agsf_dollar_hist, dollar_per_acre_hist
@@ -7,14 +13,21 @@ from plots import agsf_dollar_hist, dollar_per_acre_hist
 url='https://gist.githubusercontent.com/rselover/a82f17ec1a97538080940248880597fe/raw/69c797301be90b135eccc00d2015a28edc630b95/weston.json'
 
 df=ingest(url)
-app = Dash()
+app = Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 
-app.layout = [
-    html.H1(children='Weston Real Estate', style={'textAlign':'center'}),
-    dcc.Dropdown(df.Address.unique(), '144 SUDBURY RD', id='dropdown-selection'),
-    dcc.Graph(id='$/AGSF'),
-    dcc.Graph(id='plot 2')
-]
+app.layout = dbc.Container([
+    html.Div(className='row', children=[
+        html.H1(children='Weston Real Estate', style={'textAlign':'center'}),
+
+        html.Div(className='parent', children=[
+            dcc.Graph(id='$/AGSF', className='plot'),
+            html.Div(className='spacer'),
+            dcc.Graph(id='plot 2', className='plot')
+        ]),
+
+        dcc.Dropdown(df.Address.unique(), '144 SUDBURY RD', id='dropdown-selection', className='dash-bootstrap'),
+    ])
+])
 
 @callback(
     Output('$/AGSF', 'figure'),
