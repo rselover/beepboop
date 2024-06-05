@@ -82,19 +82,24 @@ app.layout = dbc.Container([
         ]),
         html.Div(className='spacer'),
         html.Div([
-            html.Label('lorem ', className='textTileLabel'),
+            html.Label('Overall $/SF', className='textTileLabel'),
             html.Br(),
             html.P(className='textTile', id='textTile6'),
+        ]),
+        html.Div(className='spacer'),
+        html.Div([
+            html.Label('Weighted $/SF', className='textTileLabel'),
+            html.Br(),
+            html.P(className='textTile', id='textTile7'),
         ]),
     ])
 ])
 
 @callback(
-    [Output('textTile1', 'children'),
-     Output('textTile2', 'children'),
-     Output('textTile3', 'children'),
-     Output('textTile4', 'children'),
-     ],
+    Output('textTile1', 'children'),
+    Output('textTile2', 'children'),
+    Output('textTile3', 'children'),
+    Output('textTile4', 'children'),
     Input('dropdown-selection', 'value')
 )
 
@@ -109,15 +114,30 @@ def update_text(address):
 
 @callback(
     Output('textTile5', 'children'),
-    [Input('dropdown-selection', 'value'),
-    Input('basement-slider', 'value')]
+    Output('textTile6', 'children'),
+    Output('textTile7', 'children'),
+    Input('dropdown-selection', 'value'),
+    Input('basement-slider', 'value'),
+    Input('offer-slider', 'value')
 )
 
-def update_text5(address, bgsf_factor):
+def update_text5(address, bgsf_factor, offer_price):
     dff = df[df.Address==address]
     discount_bgsf=dff['BGSF'].values[0]*bgsf_factor
     dtsf=dff['GLA (Above Grade)'].values[0]+discount_bgsf
-    return f"{dtsf}"
+
+    # Overall $/SF
+    odsf=round(offer_price/dff['ELA'].values[0],2)
+
+    # Weighted $/SF
+    wdsf=round(offer_price/dtsf,2)
+
+    # Proportion AGSF to Weighted SF
+    wagsf=dff['GLA (Above Grade)'].values[0]/dtsf
+
+
+
+    return f"{dtsf}", f"${odsf}/SF", f"${wdsf}/SF"
 
 if __name__ == '__main__':
     app.run(debug=True)
