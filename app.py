@@ -55,71 +55,69 @@ app.layout = dbc.Container([
             html.P(className='textTile', id='textTile4'),
         ])
     ]),
-
-    
+  
     html.Hr(),
 
     html.Div(className='row', children=[
-        #html.Div(className='slider', children=
-                #  [
-            dcc.Slider(800000.00, 1500000.00, step=1,
-                           marks={
-                                800000: '$800K',
-                                1000000: '$1M',
-                                1250000: '$1.25M',
-                                1500000: '$1.5M'
-                            },
-                            tooltip={"placement": "bottom", "always_visible": True,  "transform": "formatCurrency"},
-                        value=800000.00, id='offer-slider', className='slider'),
-            #html.Div(className='spacer'),
-            dcc.Slider(0.6, 1, 0.05, value=0.8, id='basement-slider', className='slider',
-                       tooltip={"placement": "bottom", "always_visible": True}),
-        #
-        # ],
-            #style={
-        #'display': 'flex',
-        #'width': '50%',
-        #'justify-content': 'center',
-    #}
-        #)
+        dcc.Slider(800000.00, 1500000.00, step=1,
+                        marks={
+                            800000: '$800K',
+                            1000000: '$1M',
+                            1250000: '$1.25M',
+                            1500000: '$1.5M'
+                        },
+                        tooltip={"placement": "bottom", "always_visible": True,  "transform": "formatCurrency"},
+                    value=800000.00, id='offer-slider', className='slider'),
+        dcc.Slider(0.5, 1, 0.05, value=0.65, id='basement-slider', className='slider',
+                    tooltip={"placement": "bottom", "always_visible": True}),
+    ]),
+
+    html.Hr(),
+
+    html.Div(className='parent', children=[
+        html.Div([
+            html.Label('Discounted Total Square Footage', className='textTileLabel'),
+            html.Br(),
+            html.P(className='textTile', id='textTile5'),
+        ]),
+        html.Div(className='spacer'),
+        html.Div([
+            html.Label('lorem ', className='textTileLabel'),
+            html.Br(),
+            html.P(className='textTile', id='textTile6'),
+        ]),
     ])
 ])
 
 @callback(
-    Output('textTile1', 'children'),
+    [Output('textTile1', 'children'),
+     Output('textTile2', 'children'),
+     Output('textTile3', 'children'),
+     Output('textTile4', 'children'),
+     ],
     Input('dropdown-selection', 'value')
 )
 
-def update_text1(value):
-    dff = df[df.Address==value]
-    return f"{dff['Acres'].values[0]}"
+def update_text(address):
+    dff = df[df.Address==address]
+    acres=dff['Acres'].values[0]
+    gla=dff['GLA (Above Grade)'].values[0]
+    ela=dff['ELA'].values[0]
+    bgsf=dff['BGSF'].values[0]
+
+    return f"{acres}" , f"{gla}", f"{ela}", f"{bgsf}"
 
 @callback(
-    Output('textTile2', 'children'),
-    Input('dropdown-selection', 'value')
+    Output('textTile5', 'children'),
+    [Input('dropdown-selection', 'value'),
+    Input('basement-slider', 'value')]
 )
 
-def update_text2(value):
-    dff = df[df.Address==value]
-    return f"{dff['GLA (Above Grade)'].values[0]}"
-
-@callback(
-    Output('textTile3', 'children'),
-    Input('dropdown-selection', 'value')
-)
-
-def update_text3(value):
-    dff = df[df.Address==value]
-    return f"{dff['ELA'].values[0]}"
-
-@callback(
-    Output('textTile4', 'children'),
-    Input('dropdown-selection', 'value')
-)
-
-def update_text4(value):
-    dff = df[df.Address==value]
-    return f"{dff['BGSF'].values[0]}"
+def update_text5(address, bgsf_factor):
+    dff = df[df.Address==address]
+    discount_bgsf=dff['BGSF'].values[0]*bgsf_factor
+    dtsf=dff['GLA (Above Grade)'].values[0]+discount_bgsf
+    return f"{dtsf}"
 
 if __name__ == '__main__':
     app.run(debug=True)
