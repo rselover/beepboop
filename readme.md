@@ -1,9 +1,6 @@
 # BeepBoop: Real Estate Data Visualization for Middlesex County, MA
 BeepBoop is a powerful data visualization tool that leverages the power of Plotly to provide interactive and insightful visualizations of real estate data in Middlesex County, MA.
 
-# Deployment
-Currently deployed at [https://beepboop-rselover.replit.app/](https://beepboop-rselover.replit.app/)
-
 # Features
 - Interactive plots: BeepBoop uses Plotly, a dynamic and interactive graphing library, to create beautiful and insightful visualizations.
 - Real estate data analysis: Analyze various aspects of real estate data such as price trends, property types, location-based analysis, and more.
